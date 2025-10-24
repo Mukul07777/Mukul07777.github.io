@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mukul | CSE Portfolio</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome (for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Typed.js (for typing animation) -->
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+
+    <style>
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Apply Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000; /* True black background */
+        }
+
+        /* Gradient text for hero */
+        .gradient-text {
+            background-image: linear-gradient(to right, #22d3ee, #a855f7); /* Cyan/Purple */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse-gradient 4s ease-in-out infinite; /* ADDED animation */
+        }
+
+        /* Project card hover effect */
+        .project-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* ADDED border-color */
+            border: 1px solid transparent; /* ADDED base border */
+        }
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.3), 0 4px 6px -2px rgba(168, 85, 247, 0.1); /* Purple shadow */
+            border-color: rgba(168, 85, 247, 0.5); /* ADDED glow border */
+        }
+
+        /* --- New Animations --- */
+
+        /* 1. Subtle background pan for hero */
+        .hero-bg {
+            background-size: 150% 150%;
+            animation: subtle-pan 20s ease infinite;
+        }
+
+        /* 2. Scroll-triggered fade-in animation */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 3. Skill tag hover effect */
+        .skill-tag {
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+        .skill-tag:hover {
+            transform: scale(1.1);
+            filter: brightness(1.25);
+        }
+
+        /* 4. Ensure typed cursor is visible */
+        .typed-cursor {
+            color: #a855f7; /* Purple cursor */
+            font-size: 1.8rem; /* Match subtitle size */
+        }
+
+        /* 5. ADDED: Gradient text pulse */
+        @keyframes pulse-gradient {
+            0%, 100% { text-shadow: 0 0 10px rgba(34, 211, 238, 0.2), 0 0 20px rgba(168, 85, 247, 0.2); }
+            50% { text-shadow: 0 0 20px rgba(34, 211, 238, 0.5), 0 0 40px rgba(168, 85, 247, 0.5); }
+        }
+
+        /* 6. ADDED: Hero Button Glow */
+        .hero-btn {
+            transition: all 0.3s ease;
+        }
+        .hero-btn:hover {
+            box-shadow: 0 0 25px 3px rgba(168, 85, 247, 0.4); /* Purple glow */
+        }
+
+        /* 7. ADDED: Glassmorphism Card Style */
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.75rem; /* 12px */
+            padding: 1.5rem; /* 24px */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 8. ADDED: Glassmorphism Input Style */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        /* 9. ADDED: "About Me" Image Hover Effect */
+        .profile-pic {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .profile-pic:hover {
+            transform: rotate(3deg) scale(1.05);
+            box-shadow: 0 0 30px 5px rgba(168, 85, 247, 0.4);
+        }
+
+        /* --- New Ticker Animation --- */
+        @keyframes marquee-fast {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee-fast {
+            animation: marquee-fast 40s linear infinite;
+            display: flex;
+            width: max-content;
+        }
+        
+        /* --- New Project Scroller Animation --- */
+        @keyframes marquee-projects {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee-projects {
+            animation: marquee-projects 60s linear infinite; /* Slower than skills ticker */
+            display: flex;
+            width: max-content;
+        }
+
+    </style>
+</head>
+<body class="bg-black text-gray-200 antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-md shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <nav class="flex justify-between items-center">
+                <!-- Your Name / Logo (now a "Home" link) -->
+                <a href="#" class="text-2xl font-bold text-white hover:text-purple-400 transition-colors duration-300">
+                    MUKUL
+                </a>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#about" class="text-lg text-gray-300 hover:text-purple-400 transition-colors duration-300">About</a>
+                    <a href="#skills" class="text-lg text-gray-300 hover:text-purple-400 transition-colors duration-300">Skills</a>
+                    <a href="#projects" class="text-lg text-gray-300 hover:text-purple-400 transition-colors duration-300">Projects</a>
+                    <a href="#contact" class="text-lg text-gray-300 hover:text-purple-400 transition-colors duration-300">Contact</a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </nav>
+        </div>
+        
+        <!-- Mobile Menu (Dropdown) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-900">
+            <a href="#about" class="block px-6 py-3 text-white hover:bg-purple-600 transition-colors duration-300">About</a>
+            <a href="#skills" class="block px-6 py-3 text-white hover:bg-purple-600 transition-colors duration-300">Skills</a>
+            <a href="#projects" class="block px-6 py-3 text-white hover:bg-purple-600 transition-colors duration-300">Projects</a>
+            <a href="#contact" class="block px-6 py-3 text-white hover:bg-purple-600 transition-colors duration-300">Contact</a>
+        </div>
+    </header>
+
+    <!-- Skills Ticker -->
+    <div class="relative w-full overflow-hidden bg-gray-900 py-4 border-b border-t border-gray-800">
+        <div class="animate-marquee-fast whitespace-nowrap">
+            <!-- Content repeated 2-3 times for seamless loop -->
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-python fa-lg mr-3 text-cyan-400"></i> Python</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-solid fa-robot fa-lg mr-3 text-purple-400"></i> Generative AI</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-solid fa-c fa-lg mr-3 text-teal-400"></i> C Language</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-react fa-lg mr-3 text-cyan-400"></i> React</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-git-alt fa-lg mr-3 text-teal-400"></i> Git & GitHub</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-node-js fa-lg mr-3 text-purple-400"></i> Node.js</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-java fa-lg mr-3 text-cyan-400"></i> Java</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-solid fa-database fa-lg mr-3 text-teal-400"></i> SQL</span>
+            
+            <!-- Repeat -->
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-python fa-lg mr-3 text-cyan-400"></i> Python</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-solid fa-robot fa-lg mr-3 text-purple-400"></i> Generative AI</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-solid fa-c fa-lg mr-3 text-teal-400"></i> C Language</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-react fa-lg mr-3 text-cyan-400"></i> React</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-git-alt fa-lg mr-3 text-teal-400"></i> Git & GitHub</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-node-js fa-lg mr-3 text-purple-400"></i> Node.js</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-java fa-lg mr-3 text-cyan-400"></i> Java</span>
+            <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-solid fa-database fa-lg mr-3 text-teal-400"></i> SQL</span>
+        </div>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-screen flex items-center">
+            <!-- Moving Gradient Background -->
+            <div class="absolute inset-0 -z-10 overflow-hidden">
+                <div class="hero-bg absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-purple-900/30"></div>
+            </div>
+
+            <div class="container mx-auto px-6 py-20 text-center relative z-10">
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-4">
+                    Hi, I'm <span class="gradient-text">MUKUL</span>
+                </h1>
+                <p class="text-xl md:text-3xl text-purple-300 font-medium mb-8">
+                    <!-- This span will be targeted by Typed.js -->
+                    <span id="typed-subtitle"></span>
+                </p>
+                <div class="flex justify-center gap-4">
+                    <a href="#projects" class="hero-btn bg-purple-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-purple-700 transition-all duration-300 text-lg">
+                        View My Projects
+                    </a>
+                    <a href="#contact" class="hero-btn bg-gray-800 text-white font-semibold px-8 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-lg">
+                        Get In Touch
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section id="about" class="py-20 sm:py-28 bg-gray-900 fade-in-section">
+            <div class="container mx-auto px-6 max-w-4xl text-center">
+                <h2 class="text-4xl font-bold text-white mb-6">About Me</h2>
+                <img src="https://placehold.co/150x150/a855f7/111827?text=M&font=inter" alt="A professional photo of yourself" class="profile-pic w-40 h-40 rounded-3xl mx-auto mb-8 border-4 border-purple-500 shadow-lg">
+                <p class="text-lg md:text-xl text-gray-300 leading-relaxed">
+                    Hello! I'm a passionate Computer Science Engineering student at the <span class="font-semibold text-purple-300">Indraprastha Institute of Information Technology, Delhi (IIIT-D)</span>. I'm also involved with the CSE E-Cell and am the founder of TasteTron. I love exploring new technologies, especially in fields like <span class="font-semibold text-cyan-300">AI/ML and Generative AI</span>. My goal is to leverage my skills to create impactful and user-friendly applications.
+                </p>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-20 sm:py-28 bg-black fade-in-section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center text-white mb-12 sm:mb-16">
+                    My Technical Skills
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Languages -->
+                    <div class="glass-card">
+                        <h3 class="text-2xl font-bold text-white mb-4 text-center">Languages</h3>
+                        <div class="flex flex-wrap gap-3 justify-center">
+                            <span class="skill-tag bg-cyan-600 text-white px-4 py-1 rounded-full text-md font-medium">Python</span>
+                            <span class="skill-tag bg-cyan-600 text-white px-4 py-1 rounded-full text-md font-medium">C</span>
+                            <span class="skill-tag bg-cyan-600 text-white px-4 py-1 rounded-full text-md font-medium">JavaScript</span>
+                            <span class="skill-tag bg-cyan-600 text-white px-4 py-1 rounded-full text-md font-medium">Java</span>
+                            <span class="skill-tag bg-gray-700 text-gray-200 px-4 py-1 rounded-full text-md font-medium">HTML/CSS</span>
+                        </div>
+                    </div>
+                    <!-- Frameworks & Libraries -->
+                    <div class="glass-card">
+                        <h3 class="text-2xl font-bold text-white mb-4 text-center">Frameworks & Libraries</h3>
+                        <div class="flex flex-wrap gap-3 justify-center">
+                            <span class="skill-tag bg-purple-600 text-white px-4 py-1 rounded-full text-md font-medium">Generative AI</span>
+                            <span class="skill-tag bg-purple-600 text-white px-4 py-1 rounded-full text-md font-medium">React</span>
+                            <span class="skill-tag bg-purple-600 text-white px-4 py-1 rounded-full text-md font-medium">Node.js</span>
+                            <span class="skill-tag bg-purple-600 text-white px-4 py-1 rounded-full text-md font-medium">NumPy/Pandas</span>
+                            <span class="skill-tag bg-gray-700 text-gray-200 px-4 py-1 rounded-full text-md font-medium">Tailwind CSS</span>
+                        </div>
+                    </div>
+                    <!-- Tools & Databases -->
+                    <div class="glass-card">
+                        <h3 class="text-2xl font-bold text-white mb-4 text-center">Tools & Databases</h3>
+                        <div class="flex flex-wrap gap-3 justify-center">
+                            <span class="skill-tag bg-teal-600 text-white px-4 py-1 rounded-full text-md font-medium">Git & GitHub</span>
+                            <span class="skill-tag bg-teal-600 text-white px-4 py-1 rounded-full text-md font-medium">Docker</span>
+                            <span class="skill-tag bg-teal-600 text-white px-4 py-1 rounded-full text-md font-medium">MongoDB</span>
+                            <span class="skill-tag bg-teal-600 text-white px-4 py-1 rounded-full text-md font-medium">MySQL</span>
+                            <span class="skill-tag bg-gray-700 text-gray-200 px-4 py-1 rounded-full text-md font-medium">Firebase</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 sm:py-28 bg-gray-900 fade-in-section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center text-white mb-12 sm:mb-16">
+                    Experience & Projects
+                </h2>
+                
+                <!-- Continuous Scroller -->
+                <div class="relative w-full overflow-hidden">
+                    <!-- Gradient fades for scroller edges -->
+                    <div class="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
+                    <div class="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-gray-900 to-transparent z-10"></div>
+                    
+                    <div class="animate-marquee-projects whitespace-nowrap">
+                        
+                        <!-- Project Card 1 -->
+                        <div class="flex-shrink-0 w-96 p-4">
+                            <div class="project-card bg-black rounded-lg shadow-xl overflow-hidden h-full">
+                                <img src="https://placehold.co/600x400/1f2937/a855f7?text=DRDO&font=inter" alt="DRDO Internship" class="w-full h-48 object-cover">
+                                <div class="p-6">
+                                    <h3 class="text-2xl font-bold text-white mb-3">Internship Trainee (AI/ML)</h3>
+                                    <p class="text-gray-400 mb-4">
+                                        Completed a 6-week Summer Internship at Solid State Physics Laboratory (SSPL), DRDO, Delhi. Focused on AI/ML applications.
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">AI/ML</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">DRDO</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Internship</span>
+                                    </div>
+                                    <div class="flex gap-4 mt-auto">
+                                        <a href="#" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300">
+                                            <i class="fa-solid fa-certificate mr-1"></i> View Certificate
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Project Card 2 -->
+                        <div class="flex-shrink-0 w-96 p-4">
+                            <div class="project-card bg-black rounded-lg shadow-xl overflow-hidden h-full">
+                                <img src="https://placehold.co/600x400/1f2937/22d3ee?text=Finlatics&font=inter" alt="Finlatics Trainee" class="w-full h-48 object-cover">
+                                <div class="p-6">
+                                    <h3 class="text-2xl font-bold text-white mb-3">Generative AI Trainee</h3>
+                                    <p class="text-gray-400 mb-4">
+                                        Participated in a 1-month Generative AI training program with Finlatics, focusing on [add key focus area here].
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Generative AI</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Finlatics</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Training</span>
+                                    </div>
+                                    <div class="flex gap-4 mt-auto">
+                                        <a href="#" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300">
+                                            <i class="fa-solid fa-certificate mr-1"></i> View Certificates
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project Card 3 -->
+                        <div class="flex-shrink-0 w-96 p-4">
+                            <div class="project-card bg-black rounded-lg shadow-xl overflow-hidden h-full">
+                                <img src="https://placehold.co/600x400/1f2937/e5e7eb?text=TasteTron&font=inter" alt="TasteTron Founder" class="w-full h-48 object-cover">
+                                <div class="p-6">
+                                    <h3 class="text-2xl font-bold text-white mb-3">Founder - TasteTron</h3>
+                                    <p class="text-gray-400 mb-4">
+                                        Founder of TasteTron, [add a brief 1-2 sentence description of what TasteTron is or does].
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Founder</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Entrepreneurship</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">CSE E-Cell</span>
+                                    </div>
+                                    <div class="flex gap-4 mt-auto">
+                                        <a href="#" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300">
+                                            <i class="fa-brands fa-github mr-1"></i> GitHub
+                                        </a>
+                                        <a href="#" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300">
+                                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Live Demo
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- REPEAT Projects for seamless loop -->
+                        
+                        <!-- Project Card 1 (Repeat) -->
+                        <div class="flex-shrink-0 w-96 p-4">
+                            <div class="project-card bg-black rounded-lg shadow-xl overflow-hidden h-full">
+                                <img src="https://placehold.co/600x400/1f2937/a855f7?text=DRDO&font=inter" alt="DRDO Internship" class="w-full h-48 object-cover">
+                                <div class="p-6">
+                                    <h3 class="text-2xl font-bold text-white mb-3">Internship Trainee (AI/ML)</h3>
+                                    <p class="text-gray-400 mb-4">
+                                        Completed a 6-week Summer Internship at Solid State Physics Laboratory (SSPL), DRDO, Delhi. Focused on AI/ML applications.
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">AI/ML</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">DRDO</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Internship</span>
+                                    </div>
+                                    <div class="flex gap-4 mt-auto">
+                                        <a href="#" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300">
+                                            <i class="fa-solid fa-certificate mr-1"></i> View Certificate
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Project Card 2 (Repeat) -->
+                        <div class="flex-shrink-0 w-96 p-4">
+                            <div class="project-card bg-black rounded-lg shadow-xl overflow-hidden h-full">
+                                <img src="https://placehold.co/600x400/1f2937/22d3ee?text=Finlatics&font=inter" alt="Finlatics Trainee" class="w-full h-48 object-cover">
+                                <div class="p-6">
+                                    <h3 class="text-2xl font-bold text-white mb-3">Generative AI Trainee</h3>
+                                    <p class="text-gray-400 mb-4">
+                                        Participated in a 1-month Generative AI training program with Finlatics, focusing on [add key focus area here].
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Generative AI</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Finlatics</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Training</span>
+                                    </div>
+                                    <div class="flex gap-4 mt-auto">
+                                        <a href="#" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300">
+                                            <i class="fa-solid fa-certificate mr-1"></i> View Certificates
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project Card 3 (Repeat) -->
+                        <div class="flex-shrink-0 w-96 p-4">
+                            <div class="project-card bg-black rounded-lg shadow-xl overflow-hidden h-full">
+                                <img src="https://placehold.co/600x400/1f2937/e5e7eb?text=TasteTron&font=inter" alt="TasteTron Founder" class="w-full h-48 object-cover">
+                                <div class="p-6">
+                                    <h3 class="text-2xl font-bold text-white mb-3">Founder - TasteTron</h3>
+                                    <p class="text-gray-400 mb-4">
+                                        Founder of TasteTron, [add a brief 1-2 sentence description of what TasteTron is or does].
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Founder</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">Entrepreneurship</span>
+                                        <span class="bg-purple-800 text-purple-200 text-xs font-semibold px-3 py-1 rounded-full">CSE E-Cell</span>
+                                    </div>
+                                    <div class="flex gap-4 mt-auto">
+                                        <a href="#" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300">
+                                            <i class="fa-brands fa-github mr-1"></i> GitHub
+                                        </a>
+                                        <a href="#" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-300">
+                                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Live Demo
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 sm:py-28 bg-black fade-in-section">
+            <div class="container mx-auto px-6 max-w-lg text-center">
+                <h2 class="text-4xl font-bold text-white mb-4">Get In Touch</h2>
+                <p class="text-lg text-gray-400 mb-10">
+                    Have a question or want to work together? Feel free to send me a message!
+                </p>
+                
+                <!-- Contact Form -->
+                <form id="contact-form" class="text-left">
+                    <div class="mb-5">
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-300">Your Name</label>
+                        <input type="text" id="name" class="glass-input text-white text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" placeholder="John Doe" required>
+                    </div>
+                    <div class="mb-5">
+                        <label for="email" class="block mb-2 text-sm font-medium text-gray-300">Your Email</label>
+                        <input type="email" id="email" class="glass-input text-white text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" placeholder="name@example.com" required>
+                    </div>
+                    <div class="mb-5">
+                        <label for="message" class="block mb-2 text-sm font-medium text-gray-300">Your Message</label>
+                        <textarea id="message" rows="4" class="glass-input text-white text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" placeholder="Your message..." required></textarea>
+                    </div>
+                    <button type="submit" class="hero-btn w-full text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-800 font-medium rounded-lg text-lg px-5 py-3 text-center transition-colors duration-300">
+                        Send Message
+                    </button>
+                </form>
+
+                <!-- Form submission message -->
+                <div id="form-message" class="mt-6 text-lg text-green-400" role="alert"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <div class="flex justify-center space-x-6 mb-6">
+                <!-- Add your social links here -->
+                <a href="#" aria-label="GitHub" class="hover:text-purple-400 transition-colors duration-300">
+                    <i class="fa-brands fa-github fa-2x"></i>
+                </a>
+                <a href="#" aria-label="LinkedIn" class="hover:text-purple-400 transition-colors duration-300">
+                    <i class="fa-brands fa-linkedin fa-2x"></i>
+                </a>
+                <a href="#" aria-label="Twitter" class="hover:text-purple-400 transition-colors duration-300">
+                    <i class="fa-brands fa-twitter fa-2x"></i>
+                </a>
+                <a href="mailto:your-email@example.com" aria-label="Email" class="hover:text-purple-400 transition-colors duration-300">
+                    <i class="fa-solid fa-envelope fa-2x"></i>
+                </a>
+            </div>
+            <p>&copy; <span id="current-year"></span> MUKUL. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 1. Typed.js Initialization
+            if (typeof Typed !== 'undefined') {
+                new Typed('#typed-subtitle', {
+                    strings: [
+                        'IIIT-Delhi Student', 
+                        'CSE E-Cell', 
+                        'Founder (TasteTron)', 
+                        'Generative AI Trainee',
+                        'DRDO Intern (AI/ML)'
+                    ],
+                    typeSpeed: 60,
+                    backSpeed: 30,
+                    loop: true,
+                    backDelay: 2000,
+                });
+            }
+
+            // 2. Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // 3. Current Year for Footer
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            // 4. Scroll-triggered Fade-in Animation
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, {
+                threshold: 0.1 // Trigger when 10% of the element is visible
+            });
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // 5. Contact Form Submission
+            const contactForm = document.getElementById('contact-form');
+            const formMessage = document.getElementById('form-message');
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent actual submission
+                
+                // Simulate form submission
+                formMessage.textContent = 'Thank you! Your message has been sent.';
+                formMessage.classList.remove('text-red-400');
+                formMessage.classList.add('text-green-400');
+                
+                // Clear the form
+                contactForm.reset();
+
+                // Remove the message after 5 seconds
+                setTimeout(() => {
+                    formMessage.textContent = '';
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>
+
