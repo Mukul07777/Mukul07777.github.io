@@ -75,12 +75,12 @@
         /* Scroll-triggered fade-in animation */
         .fade-in-section {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(50px) scale(0.98); /* Changed from 30px, added scale */
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
         .fade-in-section.is-visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1); /* Added scale */
         }
 
         /* NEW: Project Marquee Animation */
@@ -92,6 +92,15 @@
             animation: marquee-projects 60s linear infinite;
             display: flex;
             width: max-content;
+        }
+
+        /* NEW: Preloader Hide Animation */
+        #preloader {
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
         }
 
         /* NEW: Styles for Tabbed Skills Section */
@@ -130,11 +139,31 @@
             background-color: #4b5563; /* Lighter gray on hover */
         }
         /* REMOVED color-specific classes */
+
+        /* NEW: Particle Canvas Style */
+        #particle-canvas {
+            position: fixed; /* Make it stay in the background */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh; /* Cover the full viewport height */
+            z-index: 0; /* Behind all content */
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-300 antialiased">
 
-    <!-- Header & Navigation --><header class="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md shadow-lg border-b border-gray-800">
+    <!-- NEW: Preloader -->
+    <div id="preloader" class="fixed top-0 left-0 w-full h-full bg-gray-900 flex items-center justify-center z-[1000]">
+        <div class="text-4xl md:text-6xl font-bold">
+            <span id="preloader-typed" class="gradient-text"></span>
+        </div>
+    </div>
+
+    <!-- NEW: Particle Canvas moved to be a direct child of body -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Header & Navigation --><header class="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md shadow-lg border-b border-gray-800 relative z-20"> <!-- Added relative z-20 -->
         <div class="container mx-auto px-6 py-4">
             <nav class="flex justify-between items-center">
                 <!-- Your Name / Logo --><a href="#" class="text-2xl font-bold text-white hover:text-purple-400 transition-colors duration-300">
@@ -164,8 +193,9 @@
         </div>
     </header>
 
-    <main>
-        <!-- Hero Section (New 2-Column Layout) --><section id="hero" class="relative min-h-screen flex items-center overflow-hidden bg-gray-900">
+    <!-- Set main content to be on top of the canvas --><main class="relative z-10"> <!-- Added relative z-10 -->
+        <!-- Hero Section (New 2-Column Layout) --><section id="hero" class="relative min-h-screen flex items-center overflow-hidden bg-transparent"> <!-- bg-gray-900 changed to bg-transparent -->
+            
             <div class="container mx-auto px-6 py-20 relative z-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     
@@ -204,12 +234,12 @@
             </div>
         </section>
 
-        <!-- Skills Ticker (Moved below Hero) --><div class="relative w-full overflow-hidden bg-gray-900 py-4 border-b border-t border-gray-800">
+        <!-- Skills Ticker (Moved below Hero) -->
+        <!-- UPDATED: Added bg-gray-800/90, backdrop-blur-sm, and shadow-lg for highlight effect AND fade-in-section -->
+        <div class="relative w-full overflow-hidden bg-gray-800/90 backdrop-blur-sm py-4 border-b border-t border-gray-800 z-10 shadow-lg fade-in-section"> 
             <div class="animate-marquee-fast whitespace-nowrap">
-                <!-- Content repeated 2-3 times for seamless loop --><span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-python fa-lg mr-3 text-cyan-400"></i> Python</span>
-                <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-solid fa-robot fa-lg mr-3 text-purple-400"></i> Generative AI</span>
-                <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-solid fa-c fa-lg mr-3 text-teal-400"></i> C Language</span>
-                <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-react fa-lg mr-3 text-cyan-400"></i> React</span>
+                <!-- Content repeated 2-3 times for seamless loop -->
+                <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-python fa-lg mr-3 text-cyan-400"></i> Python</span>
                 <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-git-alt fa-lg mr-3 text-teal-400"></i> Git & GitHub</span>
                 <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-node-js fa-lg mr-3 text-purple-400"></i> Node.js</span>
                 <span class="flex items-center text-lg mx-8 text-gray-400"><i class="fa-brands fa-java fa-lg mr-3 text-cyan-400"></i> Java</span>
@@ -227,7 +257,7 @@
         </div>
 
 
-        <!-- About Me Section --><section id="about" class="py-20 sm:py-28 bg-gray-900 fade-in-section">
+        <!-- About Me Section --><section id="about" class="py-20 sm:py-28 bg-transparent fade-in-section"> <!-- bg-gray-900 changed to bg-transparent -->
             <div class="container mx-auto px-6 max-w-4xl text-center">
                 <h2 class="text-3xl font-bold text-center text-white mb-2">ABOUT ME</h2>
                 <p class="text-lg text-gray-500 text-center mb-12">A brief introduction about myself</p>
@@ -238,7 +268,7 @@
             </div>
         </section>
 
-        <!-- Skills Section (New Tabbed Layout) --><section id="skills" class="py-20 sm:py-28 bg-gray-900 fade-in-section">
+        <!-- Skills Section (New Tabbed Layout) --><section id="skills" class="py-20 sm:py-28 bg-transparent fade-in-section"> <!-- bg-gray-900 changed to bg-transparent -->
             <div class="container mx-auto px-6 max-w-4xl">
                 <h2 class="text-3xl font-bold text-center text-white mb-2">MY SKILLS</h2>
                 <p class="text-lg text-gray-500 text-center mb-12">The technologies I've worked with</p>
@@ -318,7 +348,7 @@
             </div>
         </section>
 
-        <!-- Projects Section (New Static Grid) --><section id="projects" class="py-20 sm:py-28 bg-gray-900 fade-in-section">
+        <!-- Projects Section (New Static Grid) --><section id="projects" class="py-20 sm:py-28 bg-transparent fade-in-section"> <!-- bg-gray-900 changed to bg-transparent -->
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center text-white mb-2">MY PROJECTS</h2>
                 <p class="text-lg text-gray-500 text-center mb-12">A selection of my best work</p>
@@ -475,7 +505,7 @@
             </div>
         </section>
 
-        <!-- Contact Section --><section id="contact" class="py-20 sm:py-28 bg-gray-900 fade-in-section">
+        <!-- Contact Section --><section id="contact" class="py-20 sm:py-28 bg-transparent fade-in-section"> <!-- bg-gray-900 changed to bg-transparent -->
             <div class="container mx-auto px-6 max-w-lg text-center">
                 <h2 class="text-3xl font-bold text-center text-white mb-2">GET IN TOUCH</h2>
                 <p class="text-lg text-gray-500 text-center mb-10">
@@ -506,7 +536,7 @@
         </section>
     </main>
 
-    <!-- Footer --><footer class="bg-gray-900 border-t border-gray-800 py-12">
+    <!-- Footer --><footer class="bg-gray-900 border-t border-gray-800 py-12 relative z-10"> <!-- Added relative z-10 -->
         <div class="container mx-auto px-6 text-center text-gray-500">
             <div class="flex justify-center space-x-6 mb-6">
                 <!-- Add your social links here --><a href="#" aria-label="GitHub" class="hover:text-purple-400 transition-colors duration-300">
@@ -529,21 +559,48 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
-            // 1. Typed.js Initialization
+            const preloader = document.getElementById('preloader');
+
+            // --- 1. PRELOADER TYPING ---
             if (typeof Typed !== 'undefined') {
-                new Typed('#typed-subtitle', {
-                    strings: [
-                        'IIIT-Delhi Student', 
-                        'CSE E-Cell', 
-                        'Founder (TasteTron)', 
-                        'Generative AI Trainee',
-                        'DRDO Intern (AI/ML)'
-                    ],
-                    typeSpeed: 60,
-                    backSpeed: 30,
-                    loop: true,
-                    backDelay: 2000,
+                new Typed('#preloader-typed', {
+                    strings: ['Hello.', 'Namaste.', 'Welcome...'],
+                    typeSpeed: 80,
+                    backSpeed: 40,
+                    loop: false,
+                    showCursor: true,
+                    onComplete: (self) => {
+                        // After typing finishes, wait 500ms then fade out
+                        setTimeout(() => {
+                            preloader.classList.add('hidden');
+                            // --- 2. MAIN HERO TYPING (starts after preloader fades) ---
+                            initializeMainTyping();
+                        }, 500); // Wait 0.5s after "Welcome..."
+                    }
                 });
+            } else {
+                // Fallback if Typed.js fails
+                preloader.classList.add('hidden');
+                initializeMainTyping();
+            }
+            
+            // --- WRAP MAIN TYPING IN A FUNCTION ---
+            function initializeMainTyping() {
+                if (typeof Typed !== 'undefined') {
+                    new Typed('#typed-subtitle', {
+                        strings: [
+                            'IIIT-Delhi Student', 
+                            'CSE E-Cell', 
+                            'Founder (TasteTron)', 
+                            'Generative AI Trainee',
+                            'DRDO Intern (AI/ML)'
+                        ],
+                        typeSpeed: 60,
+                        backSpeed: 30,
+                        loop: true,
+                        backDelay: 2000,
+                    });
+                }
             }
 
             // 2. Mobile Menu Toggle
@@ -642,11 +699,127 @@
                 });
             });
 
+            // 7. NEW: Particle Network Animation
+            const canvas = document.getElementById('particle-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                const maxDistance = 120; // Max distance for lines
+
+                class Particle {
+                    constructor(x, y) {
+                        this.x = x || Math.random() * canvas.width;
+                        this.y = y || Math.random() * canvas.height;
+                        this.size = Math.random() * 2 + 1;
+                        this.speedX = Math.random() * 0.6 - 0.3;
+                        this.speedY = Math.random() * 0.6 - 0.3;
+                        this.color = 'rgba(34, 211, 238, 0.4)'; // Faint cyan
+                    }
+                    update() {
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+
+                        // Bounce off edges
+                        if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                        if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+                    }
+                    draw() {
+                        ctx.fillStyle = this.color;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                let mouse = { x: null, y: null, radius: 100 }; // Mouse interaction radius
+
+                window.addEventListener('mousemove', function(e) {
+                    mouse.x = e.x;
+                    mouse.y = e.y;
+                });
+                window.addEventListener('mouseout', function() {
+                    mouse.x = null;
+                    mouse.y = null;
+                });
+
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    // Set height to match the full viewport
+                    canvas.height = window.innerHeight; 
+                    initParticles();
+                }
+                window.addEventListener('resize', resizeCanvas);
+                
+                function initParticles() {
+                    particles = [];
+                    let numberOfParticles = (canvas.width * canvas.height) / 12000;
+                    if (numberOfParticles > 150) numberOfParticles = 150; // Max particles
+                    if (numberOfParticles < 40) numberOfParticles = 40;   // Min particles
+                    
+                    for (let i = 0; i < numberOfParticles; i++) {
+                        particles.push(new Particle());
+                    }
+                }
+                
+                function connectParticles() {
+                    for (let a = 0; a < particles.length; a++) {
+                        for (let b = a + 1; b < particles.length; b++) {
+                            let dist = Math.sqrt(
+                                (particles[a].x - particles[b].x)**2 +
+                                (particles[a].y - particles[b].y)**2
+                            );
+                            
+                            if (dist < maxDistance) {
+                                let opacity = 1 - (dist / maxDistance);
+                                ctx.strokeStyle = `rgba(168, 85, 247, ${opacity * 0.2})`; // Faint Purple lines
+                                ctx.lineWidth = 1;
+                                ctx.beginPath();
+                                ctx.moveTo(particles[a].x, particles[a].y);
+                                ctx.lineTo(particles[b].x, particles[b].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    // Connect particles to mouse
+                    if (mouse.x && mouse.y) {
+                        for (let i = 0; i < particles.length; i++) {
+                            let distToMouse = Math.sqrt(
+                                (particles[i].x - mouse.x)**2 +
+                                (particles[i].y - mouse.y)**2
+                            );
+                            if (distToMouse < mouse.radius) {
+                                let opacity = 1 - (distToMouse / mouse.radius);
+                                ctx.strokeStyle = `rgba(34, 211, 238, ${opacity * 0.4})`; // Cyan lines
+                                ctx.lineWidth = 1;
+                                ctx.beginPath();
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(mouse.x, mouse.y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let i = 0; i < particles.length; i++) {
+                        particles[i].update();
+                        particles[i].draw();
+                    }
+                    connectParticles();
+                    requestAnimationFrame(animate);
+                }
+                
+                // Initial setup
+                resizeCanvas(); // Call once to set initial size
+                initParticles();
+                animate();
+            }
+
         });
     </script>
 </body>
 </html>
-
 
 
 
