@@ -610,175 +610,166 @@
              console.log("DOM ready, initializing effects...");
              try {
                  // --- Constellation/Plexus Animation ---
-                 const canvas = document.getElementById('constellation-canvas'); // Corrected ID
-                 if (canvas) {
-                     const ctx = canvas.getContext('2d');
-                     let points = [];
-                     let mouse = { x: null, y: null, radius: 150 };
+                 try { // Added try-catch for constellation
+                     const canvas = document.getElementById('constellation-canvas'); 
+                     if (canvas) {
+                         const ctx = canvas.getContext('2d');
+                         let points = [];
+                         let mouse = { x: null, y: null, radius: 150 };
 
-                     function resizeCanvas() { 
-                         canvas.width = window.innerWidth; 
-                         canvas.height = window.innerHeight; 
-                     }
-                     window.addEventListener('resize', resizeCanvas);
-                     resizeCanvas(); // Initial size
-
-                     class Point {
-                         constructor(x, y) {
-                             this.x = x || Math.random() * canvas.width;
-                             this.y = y || Math.random() * canvas.height;
-                             this.vx = Math.random() * 0.8 - 0.4;
-                             this.vy = Math.random() * 0.8 - 0.4;
-                             this.radius = 1.5; // Smaller points
-                             this.color = 'rgba(88, 166, 255, 0.5)'; // Faint blue points
+                         function resizeCanvas() { 
+                             canvas.width = window.innerWidth; 
+                             canvas.height = window.innerHeight; 
                          }
-                         update() {
-                             this.x += this.vx;
-                             this.y += this.vy;
-                             // Bounce off edges smoothly
-                             if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                             if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-                         }
-                         draw() {
-                             ctx.fillStyle = this.color;
-                             ctx.beginPath();
-                             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                             ctx.fill();
-                         }
-                     }
-
-                     function initPoints() {
-                         points = [];
-                         let numberOfPoints = (canvas.width * canvas.height) / 10000; // Adjust density
-                         if (numberOfPoints > 150) numberOfPoints = 150; // Max points
-                         if (numberOfPoints < 50) numberOfPoints = 50; // Min points
-                         for (let i = 0; i < numberOfPoints; i++) {
-                             points.push(new Point());
-                         }
-                         console.log(`Initialized ${points.length} constellation points.`);
-                     }
-                     initPoints(); // Initialize on load
-
-                     function connectPoints() {
-                         const maxDist = 120; // Max distance for lines
-                         for (let i = 0; i < points.length; i++) {
-                             for (let j = i + 1; j < points.length; j++) {
-                                 const dx = points[i].x - points[j].x;
-                                 const dy = points[i].y - points[j].y;
-                                 const dist = Math.sqrt(dx * dx + dy * dy);
-
-                                 if (dist < maxDist) {
-                                     const opacity = 1 - dist / maxDist;
-                                     ctx.strokeStyle = `rgba(163, 113, 247, ${opacity * 0.4})`; // Faint purple lines
-                                     ctx.lineWidth = 0.8;
-                                     ctx.beginPath();
-                                     ctx.moveTo(points[i].x, points[i].y);
-                                     ctx.lineTo(points[j].x, points[j].y);
-                                     ctx.stroke();
-                                 }
-                             }
-                         }
-                         // Connect to mouse
-                         if (mouse.x && mouse.y) {
-                             for(let i = 0; i < points.length; i++) {
-                                 const dx = points[i].x - mouse.x;
-                                 const dy = points[i].y - mouse.y;
-                                 const dist = Math.sqrt(dx*dx + dy*dy);
-                                 if (dist < mouse.radius) {
-                                     const opacity = 1 - dist / mouse.radius;
-                                     ctx.strokeStyle = `rgba(88, 166, 255, ${opacity * 0.6})`; // Brighter blue lines to mouse
-                                     ctx.lineWidth = 1;
-                                     ctx.beginPath();
-                                     ctx.moveTo(points[i].x, points[i].y);
-                                     ctx.lineTo(mouse.x, mouse.y);
-                                     ctx.stroke();
-                                 }
-                             }
-                         }
-                     }
-                     
-                     window.addEventListener('mousemove', (e) => {
-                         mouse.x = e.clientX;
-                         mouse.y = e.clientY;
-                     });
-                     window.addEventListener('mouseout', () => {
-                         mouse.x = null;
-                         mouse.y = null;
-                     });
-
-
-                     function animateConstellation() {
-                         ctx.clearRect(0, 0, canvas.width, canvas.height);
-                         points.forEach(point => {
-                             point.update();
-                             point.draw();
-                         });
-                         connectPoints();
-                         requestAnimationFrame(animateConstellation);
-                     }
-                     animateConstellation(); // Start animation loop
-                     
-                     window.addEventListener('resize', () => { 
+                         window.addEventListener('resize', resizeCanvas);
                          resizeCanvas(); 
-                         initPoints(); // Reinitialize points on resize
-                     });
-                     console.log("Constellation animation initialized.");
-                 } else { console.warn("Constellation canvas not found."); }
+
+                         class Point {
+                             constructor(x, y) {
+                                 this.x = x || Math.random() * canvas.width;
+                                 this.y = y || Math.random() * canvas.height;
+                                 this.vx = Math.random() * 0.8 - 0.4;
+                                 this.vy = Math.random() * 0.8 - 0.4;
+                                 this.radius = 1.5; 
+                                 this.color = 'rgba(88, 166, 255, 0.5)'; 
+                             }
+                             update() {
+                                 this.x += this.vx; this.y += this.vy;
+                                 if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                                 if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                             }
+                             draw() {
+                                 ctx.fillStyle = this.color; ctx.beginPath();
+                                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
+                             }
+                         }
+
+                         function initPoints() {
+                             points = [];
+                             let numberOfPoints = (canvas.width * canvas.height) / 10000; 
+                             if (numberOfPoints > 150) numberOfPoints = 150; 
+                             if (numberOfPoints < 50) numberOfPoints = 50; 
+                             for (let i = 0; i < numberOfPoints; i++) {
+                                 points.push(new Point());
+                             }
+                             console.log(`Initialized ${points.length} constellation points.`);
+                         }
+                         initPoints(); 
+
+                         function connectPoints() {
+                             const maxDist = 120; 
+                             for (let i = 0; i < points.length; i++) {
+                                 for (let j = i + 1; j < points.length; j++) {
+                                     const dx = points[i].x - points[j].x; const dy = points[i].y - points[j].y;
+                                     const dist = Math.sqrt(dx * dx + dy * dy);
+                                     if (dist < maxDist) {
+                                         const opacity = 1 - dist / maxDist;
+                                         ctx.strokeStyle = `rgba(163, 113, 247, ${opacity * 0.4})`; 
+                                         ctx.lineWidth = 0.8; ctx.beginPath(); 
+                                         ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke();
+                                     }
+                                 }
+                             }
+                             if (mouse.x && mouse.y) {
+                                 for(let i = 0; i < points.length; i++) {
+                                     const dx = points[i].x - mouse.x; const dy = points[i].y - mouse.y;
+                                     const dist = Math.sqrt(dx*dx + dy*dy);
+                                     if (dist < mouse.radius) {
+                                         const opacity = 1 - dist / mouse.radius;
+                                         ctx.strokeStyle = `rgba(88, 166, 255, ${opacity * 0.6})`; 
+                                         ctx.lineWidth = 1; ctx.beginPath();
+                                         ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+                                     }
+                                 }
+                             }
+                         }
+                         
+                         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+                         window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+
+                         function animateConstellation() {
+                             ctx.clearRect(0, 0, canvas.width, canvas.height);
+                             points.forEach(point => { point.update(); point.draw(); });
+                             connectPoints(); requestAnimationFrame(animateConstellation);
+                         }
+                         animateConstellation(); 
+                         
+                         window.addEventListener('resize', () => { resizeCanvas(); initPoints(); });
+                         console.log("Constellation animation initialized.");
+                     } else { console.warn("Constellation canvas not found."); }
+                 } catch (canvasError) {
+                      console.error("Constellation animation failed:", canvasError);
+                 }
 
 
                  // --- Typed.js Initialization ---
-                 if (typeof Typed !== 'undefined') { 
-                     const typedElement = document.getElementById('typed-subtitle');
-                     if (typedElement) {
-                         try { 
+                 try { // Added try-catch for Typed.js
+                     if (typeof Typed !== 'undefined') { 
+                         const typedElement = document.getElementById('typed-subtitle');
+                         if (typedElement) {
                              new Typed('#typed-subtitle', {
                                  strings: [ 'IIIT-Delhi Student', 'Founder (TasteTron)', 'Generative AI Trainee', 'DRDO Intern (AI/ML)', 'Life-long Learner' ],
                                  typeSpeed: 60, backSpeed: 30, loop: true, backDelay: 2000,
                              });
                              console.log("Typed.js initialized.");
-                         } catch (typedError) {
-                             console.error("Typed.js initialization failed:", typedError);
-                             if(typedElement) typedElement.textContent = 'IIIT-Delhi Student'; // Fallback
-                         }
-                     } else { console.warn('Typed subtitle element not found.'); }
-                 } else {
-                     console.warn('Typed.js library not loaded.');
+                         } else { console.warn('Typed subtitle element not found.'); }
+                     } else {
+                         console.warn('Typed.js library not loaded.');
+                         const subtitleElement = document.getElementById('typed-subtitle');
+                         if(subtitleElement) subtitleElement.textContent = 'IIIT-Delhi Student'; 
+                     }
+                 } catch (typedError) {
+                     console.error("Typed.js initialization failed:", typedError);
                      const subtitleElement = document.getElementById('typed-subtitle');
-                     if(subtitleElement) subtitleElement.textContent = 'IIIT-Delhi Student'; 
+                     if(subtitleElement) subtitleElement.textContent = 'IIIT-Delhi Student'; // Fallback
                  }
 
                  // --- Mobile Menu Toggle ---
-                 const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-                 const mobileMenu = document.getElementById('mobile-menu');
-                 if (mobileMenuBtn && mobileMenu) {
-                     mobileMenuBtn.addEventListener('click', () => {
-                         mobileMenu.classList.toggle('hidden');
-                     });
-                     mobileMenu.querySelectorAll('a').forEach(link => {
-                         link.addEventListener('click', () => { mobileMenu.classList.add('hidden'); });
-                     });
-                     console.log("Mobile menu initialized.");
-                 } else { console.warn('Mobile menu elements not found.'); }
+                 try { // Added try-catch for Mobile Menu
+                    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenuBtn && mobileMenu) {
+                        mobileMenuBtn.addEventListener('click', () => {
+                            mobileMenu.classList.toggle('hidden');
+                        });
+                        mobileMenu.querySelectorAll('a').forEach(link => {
+                            link.addEventListener('click', () => { mobileMenu.classList.add('hidden'); });
+                        });
+                        console.log("Mobile menu initialized.");
+                    } else { console.warn('Mobile menu elements not found.'); }
+                 } catch (menuError) {
+                      console.error("Mobile menu initialization failed:", menuError);
+                 }
+
 
                  // --- Scroll Animations ---
-                 const animatedSections = document.querySelectorAll('.animate-on-scroll');
-                 if ("IntersectionObserver" in window && animatedSections.length > 0) {
-                     const observer = new IntersectionObserver(entries => {
-                         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
-                     }, { threshold: 0.1 });
-                     animatedSections.forEach(section => observer.observe(section));
-                     console.log(`Scroll animations initialized for ${animatedSections.length} elements.`);
-                 } else {
-                     animatedSections.forEach(section => section.classList.add('is-visible')); // Fallback
-                     if(animatedSections.length > 0) console.warn("IntersectionObserver not supported, showing all animated sections.");
-                     else console.warn('No elements found for scroll animation.');
+                 try { // Added try-catch for Scroll Animations
+                     const animatedSections = document.querySelectorAll('.animate-on-scroll');
+                     if ("IntersectionObserver" in window && animatedSections.length > 0) {
+                         const observer = new IntersectionObserver(entries => {
+                             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
+                         }, { threshold: 0.1 });
+                         animatedSections.forEach(section => observer.observe(section));
+                         console.log(`Scroll animations initialized for ${animatedSections.length} elements.`);
+                     } else {
+                         animatedSections.forEach(section => section.classList.add('is-visible')); // Fallback
+                         if(animatedSections.length > 0) console.warn("IntersectionObserver not supported, showing all animated sections.");
+                         else console.warn('No elements found for scroll animation.');
+                     }
+                 } catch (scrollError) {
+                      console.error("Scroll animation initialization failed:", scrollError);
                  }
 
                  // --- Footer Year ---
-                 const yearSpan = document.getElementById('current-year');
-                 if (yearSpan) {
-                     yearSpan.textContent = new Date().getFullYear();
-                 } else { console.warn('Current year span not found.'); }
+                 try { // Added try-catch for Footer Year
+                     const yearSpan = document.getElementById('current-year');
+                     if (yearSpan) {
+                         yearSpan.textContent = new Date().getFullYear();
+                     } else { console.warn('Current year span not found.'); }
+                 } catch (footerError) {
+                      console.error("Footer year update failed:", footerError);
+                 }
+
 
              } catch (error) {
                  console.error("Error initializing UI effects:", error);
