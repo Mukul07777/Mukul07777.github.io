@@ -28,13 +28,12 @@
         /* Apply Inter font */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d1117; /* GitHub dark background */
+            background-color: #0d1117; /* GitHub dark background fallback */
             color: #c9d1d9; /* GitHub light text */
             overflow-x: hidden;
-            /* REMOVED Animated Gradient Background */
         }
         
-        /* --- NEW: Constellation/Plexus Canvas --- */
+        /* --- Constellation/Plexus Canvas --- */
         #constellation-canvas {
             position: fixed; /* Fix it to the viewport */
             top: 0;
@@ -99,7 +98,7 @@
             border: 1px solid #30363d;
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
             width: 320px; 
-            margin: 0 1.5rem; /* Replaced p-6 on parent with margin */
+            margin: 0 1.5rem; 
         }
         .project-card:hover {
             transform: translateY(-5px);
@@ -114,7 +113,6 @@
             pointer-events: none; 
             z-index: 10; 
             width: 8rem; 
-            /* Ensure fade matches section bg */
              background-image: linear-gradient(to right, #0d1117, transparent);
         }
         .scroller-fade.right {
@@ -163,9 +161,9 @@
 
     </style>
 </head>
-<body class="text-gray-300 antialiased"> <!-- Removed bg color here -->
+<body class="text-gray-300 antialiased"> 
 
-    <!-- NEW Constellation Canvas -->
+    <!-- Constellation Canvas -->
     <canvas id="constellation-canvas"></canvas>
 
     <!-- Header -->
@@ -271,7 +269,7 @@
                     Experience & Certificates
                 </h2>
                 
-                <div class="relative w-full overflow-hidden py-2"> <!-- Added py-2 -->
+                <div class="relative w-full overflow-hidden py-2"> 
                     <!-- Fades -->
                     <div class="absolute top-0 bottom-0 left-0 scroller-fade z-10"></div>
                     <div class="absolute top-0 bottom-0 right-0 scroller-fade right z-10"></div>
@@ -471,7 +469,7 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-portfolio-app';
         let userId = null; 
         let db, auth; 
-        let firebaseReady = false; // Flag to track Firebase readiness
+        let firebaseReady = false; 
 
         // --- Initialization ---
         try {
@@ -482,17 +480,16 @@
             console.log("Firebase Initialized Successfully.");
         } catch (error) {
             console.error("Firebase initialization failed:", error);
-            // Non-critical error, site can still function visually
         }
 
         // --- Authentication ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
-                firebaseReady = true; // Mark Firebase as ready
+                firebaseReady = true; 
                 console.log("User authenticated:", userId);
-                initializeContactForm(); // Initialize only Firebase-dependent features
-                loadProfilePicture(); // Attempt to load profile picture
+                initializeContactForm(); 
+                loadProfilePicture(); 
             } else {
                 console.log("User not authenticated, attempting sign-in...");
                 try {
@@ -501,18 +498,22 @@
                     } else {
                         await signInAnonymously(auth);
                     }
-                    // onAuthStateChanged will trigger again with the user
                 } catch (error) {
                     console.error("Error signing in:", error);
                     const contactForm = document.getElementById('contact-form');
                     if (contactForm) contactForm.innerHTML = '<p class="text-red-400 text-center">Contact form disabled: Auth error.</p>';
-                    firebaseReady = false; // Firebase is not ready
+                    firebaseReady = false; 
                 }
             }
         });
 
-        // --- Contact Form Logic (Runs only AFTER Firebase is ready) ---
+        // --- Contact Form Logic ---
         function initializeContactForm() {
+            // Add extra checks
+            if (typeof getFirestore === 'undefined' || typeof collection === 'undefined' || typeof addDoc === 'undefined' || typeof serverTimestamp === 'undefined') {
+                console.error("Firestore functions not loaded correctly.");
+                return;
+            }
             if (!firebaseReady || !db) {
                 console.warn("Firebase not ready, contact form initialization skipped.");
                 return;
@@ -578,8 +579,12 @@
             console.log("Contact form listener attached.");
         }
 
-        // --- Load Profile Picture (Runs only AFTER Firebase is ready) ---
+        // --- Load Profile Picture ---
          async function loadProfilePicture() {
+             if (typeof getFirestore === 'undefined' || typeof doc === 'undefined' || typeof getDoc === 'undefined') {
+                  console.error("Firestore functions not loaded correctly for profile pic.");
+                  return;
+             }
              if (!firebaseReady || !db) return; 
              const profileImage = document.getElementById('profileImage');
              if (!profileImage) {
