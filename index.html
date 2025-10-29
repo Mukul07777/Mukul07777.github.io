@@ -509,271 +509,179 @@
 
         // --- Contact Form Logic ---
         function initializeContactForm() {
-            // Add extra checks
-            if (typeof getFirestore === 'undefined' || typeof collection === 'undefined' || typeof addDoc === 'undefined' || typeof serverTimestamp === 'undefined') {
-                console.error("Firestore functions not loaded correctly.");
-                return;
-            }
-            if (!firebaseReady || !db) {
-                console.warn("Firebase not ready, contact form initialization skipped.");
-                return;
-            }
-            
-            const contactForm = document.getElementById('contact-form');
-            const formMessage = document.getElementById('form-message');
-            if (!contactForm || !formMessage) {
-                 console.error("Contact form or message area not found in DOM.");
-                 return; 
-            }
-            const contactMessagesRef = collection(db, `artifacts/${appId}/public/data/contactMessages`);
-
-            contactForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                console.log("Contact form submit event triggered.");
+             try { // Added try-catch for safety
+                if (typeof getFirestore === 'undefined' || typeof collection === 'undefined' || typeof addDoc === 'undefined' || typeof serverTimestamp === 'undefined') {
+                    console.error("Firestore functions not loaded correctly."); return;
+                }
+                if (!firebaseReady || !db) { console.warn("Firebase not ready, contact form initialization skipped."); return; }
                 
-                const nameInput = contactForm.querySelector('#name');
-                const emailInput = contactForm.querySelector('#email');
-                const messageInput = contactForm.querySelector('#message');
-                const submitButton = contactForm.querySelector('button[type="submit"]');
+                const contactForm = document.getElementById('contact-form');
+                const formMessage = document.getElementById('form-message');
+                if (!contactForm || !formMessage) { console.error("Contact form or message area not found in DOM."); return; }
+                const contactMessagesRef = collection(db, `artifacts/${appId}/public/data/contactMessages`);
 
-                if (!nameInput || !emailInput || !messageInput || !submitButton) {
-                    console.error("Form fields or submit button not found inside handler.");
-                    formMessage.textContent = 'Form error (fields missing). Please reload.';
-                    formMessage.className = 'mt-6 text-lg text-red-400';
-                    return;
-                }
-                
-                const name = nameInput.value.trim();
-                const email = emailInput.value.trim();
-                const message = messageInput.value.trim();
+                contactForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const nameInput = contactForm.querySelector('#name');
+                    const emailInput = contactForm.querySelector('#email');
+                    const messageInput = contactForm.querySelector('#message');
+                    const submitButton = contactForm.querySelector('button[type="submit"]');
 
-                if (!name || !email || !message) {
-                    formMessage.textContent = 'Please fill out all fields.';
-                    formMessage.className = 'mt-6 text-lg text-red-400';
-                    return;
-                }
-
-                submitButton.disabled = true; 
-                submitButton.textContent = 'Sending...';
-                formMessage.textContent = 'Sending...';
-                formMessage.className = 'mt-6 text-lg text-gray-400';
-
-                try {
-                    await addDoc(contactMessagesRef, {
-                        name: name, email: email, message: message,
-                        submittedAt: serverTimestamp(), appInstanceId: appId 
-                    });
-                    console.log("Message saved to Firestore.");
-                    formMessage.textContent = 'Thank you! Your message has been sent.';
-                    formMessage.className = 'mt-6 text-lg text-green-400';
-                    contactForm.reset();
-                } catch (error) {
-                    console.error("Error saving message:", error);
-                    formMessage.textContent = 'Oops! There was a problem sending your message.';
-                    formMessage.className = 'mt-6 text-lg text-red-400';
-                } finally {
-                    submitButton.disabled = false; 
-                    submitButton.textContent = 'Send Message';
-                }
-            });
-            console.log("Contact form listener attached.");
+                    if (!nameInput || !emailInput || !messageInput || !submitButton) {
+                        formMessage.textContent = 'Form error. Please reload.'; formMessage.className = 'mt-6 text-lg text-red-400'; return;
+                    }
+                    const name = nameInput.value.trim(); const email = emailInput.value.trim(); const message = messageInput.value.trim();
+                    if (!name || !email || !message) {
+                        formMessage.textContent = 'Please fill out all fields.'; formMessage.className = 'mt-6 text-lg text-red-400'; return;
+                    }
+                    submitButton.disabled = true; submitButton.textContent = 'Sending...';
+                    formMessage.textContent = 'Sending...'; formMessage.className = 'mt-6 text-lg text-gray-400';
+                    try {
+                        await addDoc(contactMessagesRef, { name: name, email: email, message: message, submittedAt: serverTimestamp(), appInstanceId: appId });
+                        formMessage.textContent = 'Thank you! Your message has been sent.'; formMessage.className = 'mt-6 text-lg text-green-400'; contactForm.reset();
+                    } catch (error) {
+                        console.error("Error saving message:", error);
+                        formMessage.textContent = 'Oops! There was a problem sending your message.'; formMessage.className = 'mt-6 text-lg text-red-400';
+                    } finally {
+                        submitButton.disabled = false; submitButton.textContent = 'Send Message';
+                    }
+                });
+                console.log("Contact form listener attached.");
+             } catch (formError) {
+                  console.error("Error initializing contact form:", formError);
+             }
         }
 
         // --- Load Profile Picture ---
          async function loadProfilePicture() {
-             if (typeof getFirestore === 'undefined' || typeof doc === 'undefined' || typeof getDoc === 'undefined') {
-                  console.error("Firestore functions not loaded correctly for profile pic.");
-                  return;
-             }
-             if (!firebaseReady || !db) return; 
-             const profileImage = document.getElementById('profileImage');
-             if (!profileImage) {
-                 console.warn("Profile image element not found.");
-                 return;
-             }
-             const profileConfigRef = doc(db, `artifacts/${appId}/public/data/profile`, 'config');
-             try {
+             try { // Added try-catch
+                 if (typeof getFirestore === 'undefined' || typeof doc === 'undefined' || typeof getDoc === 'undefined') { console.error("Firestore functions not loaded correctly for profile pic."); return; }
+                 if (!firebaseReady || !db) return; 
+                 const profileImage = document.getElementById('profileImage');
+                 if (!profileImage) { console.warn("Profile image element not found."); return; }
+                 const profileConfigRef = doc(db, `artifacts/${appId}/public/data/profile`, 'config');
+                 
                  const docSnap = await getDoc(profileConfigRef);
                  if (docSnap.exists() && docSnap.data().profilePicUrl) {
-                      profileImage.src = docSnap.data().profilePicUrl;
-                      console.log("Profile picture loaded from Firestore.");
-                  } else {
-                      console.log("No profile picture URL found in Firestore.");
-                  }
-             } catch (error) {
-                 console.error("Error loading profile picture:", error);
-             }
+                      profileImage.src = docSnap.data().profilePicUrl; console.log("Profile picture loaded from Firestore.");
+                  } else { console.log("No profile picture URL found in Firestore."); }
+             } catch (error) { console.error("Error loading profile picture:", error); }
          }
 
         // --- ALL OTHER DYNAMIC EFFECTS (Run when DOM is ready) ---
         document.addEventListener('DOMContentLoaded', () => {
              console.log("DOM ready, initializing effects...");
-             try {
-                 // --- Constellation/Plexus Animation ---
-                 try { // Added try-catch for constellation
-                     const canvas = document.getElementById('constellation-canvas'); 
-                     if (canvas) {
-                         const ctx = canvas.getContext('2d');
-                         let points = [];
-                         let mouse = { x: null, y: null, radius: 150 };
+             
+             // --- Constellation/Plexus Animation ---
+             try { 
+                 const canvas = document.getElementById('constellation-canvas'); 
+                 if (canvas) {
+                     const ctx = canvas.getContext('2d');
+                     let points = [];
+                     let mouse = { x: null, y: null, radius: 150 };
 
-                         function resizeCanvas() { 
-                             canvas.width = window.innerWidth; 
-                             canvas.height = window.innerHeight; 
-                         }
-                         window.addEventListener('resize', resizeCanvas);
-                         resizeCanvas(); 
+                     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+                     window.addEventListener('resize', resizeCanvas);
+                     resizeCanvas(); 
 
-                         class Point {
-                             constructor(x, y) {
-                                 this.x = x || Math.random() * canvas.width;
-                                 this.y = y || Math.random() * canvas.height;
-                                 this.vx = Math.random() * 0.8 - 0.4;
-                                 this.vy = Math.random() * 0.8 - 0.4;
-                                 this.radius = 1.5; 
-                                 this.color = 'rgba(88, 166, 255, 0.5)'; 
-                             }
-                             update() {
-                                 this.x += this.vx; this.y += this.vy;
-                                 if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                                 if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-                             }
-                             draw() {
-                                 ctx.fillStyle = this.color; ctx.beginPath();
-                                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
-                             }
-                         }
-
-                         function initPoints() {
-                             points = [];
-                             let numberOfPoints = (canvas.width * canvas.height) / 10000; 
-                             if (numberOfPoints > 150) numberOfPoints = 150; 
-                             if (numberOfPoints < 50) numberOfPoints = 50; 
-                             for (let i = 0; i < numberOfPoints; i++) {
-                                 points.push(new Point());
-                             }
-                             console.log(`Initialized ${points.length} constellation points.`);
-                         }
-                         initPoints(); 
-
-                         function connectPoints() {
-                             const maxDist = 120; 
-                             for (let i = 0; i < points.length; i++) {
-                                 for (let j = i + 1; j < points.length; j++) {
-                                     const dx = points[i].x - points[j].x; const dy = points[i].y - points[j].y;
-                                     const dist = Math.sqrt(dx * dx + dy * dy);
-                                     if (dist < maxDist) {
-                                         const opacity = 1 - dist / maxDist;
-                                         ctx.strokeStyle = `rgba(163, 113, 247, ${opacity * 0.4})`; 
-                                         ctx.lineWidth = 0.8; ctx.beginPath(); 
-                                         ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke();
-                                     }
-                                 }
-                             }
-                             if (mouse.x && mouse.y) {
-                                 for(let i = 0; i < points.length; i++) {
-                                     const dx = points[i].x - mouse.x; const dy = points[i].y - mouse.y;
-                                     const dist = Math.sqrt(dx*dx + dy*dy);
-                                     if (dist < mouse.radius) {
-                                         const opacity = 1 - dist / mouse.radius;
-                                         ctx.strokeStyle = `rgba(88, 166, 255, ${opacity * 0.6})`; 
-                                         ctx.lineWidth = 1; ctx.beginPath();
-                                         ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
-                                     }
-                                 }
-                             }
-                         }
-                         
-                         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-                         window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
-
-                         function animateConstellation() {
-                             ctx.clearRect(0, 0, canvas.width, canvas.height);
-                             points.forEach(point => { point.update(); point.draw(); });
-                             connectPoints(); requestAnimationFrame(animateConstellation);
-                         }
-                         animateConstellation(); 
-                         
-                         window.addEventListener('resize', () => { resizeCanvas(); initPoints(); });
-                         console.log("Constellation animation initialized.");
-                     } else { console.warn("Constellation canvas not found."); }
-                 } catch (canvasError) {
-                      console.error("Constellation animation failed:", canvasError);
-                 }
-
-
-                 // --- Typed.js Initialization ---
-                 try { // Added try-catch for Typed.js
-                     if (typeof Typed !== 'undefined') { 
-                         const typedElement = document.getElementById('typed-subtitle');
-                         if (typedElement) {
-                             new Typed('#typed-subtitle', {
-                                 strings: [ 'IIIT-Delhi Student', 'Founder (TasteTron)', 'Generative AI Trainee', 'DRDO Intern (AI/ML)', 'Life-long Learner' ],
-                                 typeSpeed: 60, backSpeed: 30, loop: true, backDelay: 2000,
-                             });
-                             console.log("Typed.js initialized.");
-                         } else { console.warn('Typed subtitle element not found.'); }
-                     } else {
-                         console.warn('Typed.js library not loaded.');
-                         const subtitleElement = document.getElementById('typed-subtitle');
-                         if(subtitleElement) subtitleElement.textContent = 'IIIT-Delhi Student'; 
+                     class Point {
+                         constructor(x, y) { this.x = x || Math.random() * canvas.width; this.y = y || Math.random() * canvas.height; this.vx = Math.random() * 0.8 - 0.4; this.vy = Math.random() * 0.8 - 0.4; this.radius = 1.5; this.color = 'rgba(88, 166, 255, 0.5)'; }
+                         update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > canvas.width) this.vx *= -1; if (this.y < 0 || this.y > canvas.height) this.vy *= -1; }
+                         draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill(); }
                      }
-                 } catch (typedError) {
-                     console.error("Typed.js initialization failed:", typedError);
+
+                     function initPoints() {
+                         points = []; let num = (canvas.width * canvas.height) / 10000; if (num > 150) num = 150; if (num < 50) num = 50; 
+                         for (let i = 0; i < num; i++) points.push(new Point());
+                         console.log(`Initialized ${points.length} constellation points.`);
+                     }
+                     initPoints(); 
+
+                     function connectPoints() {
+                         const maxDist = 120; 
+                         for (let i = 0; i < points.length; i++) {
+                             for (let j = i + 1; j < points.length; j++) {
+                                 const dx = points[i].x - points[j].x; const dy = points[i].y - points[j].y; const dist = Math.sqrt(dx * dx + dy * dy);
+                                 if (dist < maxDist) { const op = 1 - dist / maxDist; ctx.strokeStyle = `rgba(163, 113, 247, ${op * 0.4})`; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+                             }
+                         }
+                         if (mouse.x && mouse.y) {
+                             for(let i = 0; i < points.length; i++) {
+                                 const dx = points[i].x - mouse.x; const dy = points[i].y - mouse.y; const dist = Math.sqrt(dx*dx + dy*dy);
+                                 if (dist < mouse.radius) { const op = 1 - dist / mouse.radius; ctx.strokeStyle = `rgba(88, 166, 255, ${op * 0.6})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke(); }
+                             }
+                         }
+                     }
+                     
+                     window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+                     window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+
+                     function animateConstellation() {
+                         ctx.clearRect(0, 0, canvas.width, canvas.height); points.forEach(p => { p.update(); p.draw(); }); connectPoints(); requestAnimationFrame(animateConstellation);
+                     }
+                     animateConstellation(); 
+                     
+                     window.addEventListener('resize', () => { resizeCanvas(); initPoints(); });
+                     console.log("Constellation animation initialized.");
+                 } else { console.warn("Constellation canvas not found."); }
+             } catch (canvasError) { console.error("Constellation animation failed:", canvasError); }
+
+             // --- Typed.js Initialization ---
+             try { 
+                 if (typeof Typed !== 'undefined') { 
+                     const typedElement = document.getElementById('typed-subtitle');
+                     if (typedElement) {
+                         new Typed('#typed-subtitle', {
+                             strings: [ 'IIIT-Delhi Student', 'Founder (TasteTron)', 'Generative AI Trainee', 'DRDO Intern (AI/ML)', 'Life-long Learner' ],
+                             typeSpeed: 60, backSpeed: 30, loop: true, backDelay: 2000,
+                         });
+                         console.log("Typed.js initialized.");
+                     } else { console.warn('Typed subtitle element not found.'); }
+                 } else {
+                     console.warn('Typed.js library not loaded.');
                      const subtitleElement = document.getElementById('typed-subtitle');
-                     if(subtitleElement) subtitleElement.textContent = 'IIIT-Delhi Student'; // Fallback
+                     if(subtitleElement) subtitleElement.textContent = 'IIIT-Delhi Student'; 
                  }
-
-                 // --- Mobile Menu Toggle ---
-                 try { // Added try-catch for Mobile Menu
-                    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-                    const mobileMenu = document.getElementById('mobile-menu');
-                    if (mobileMenuBtn && mobileMenu) {
-                        mobileMenuBtn.addEventListener('click', () => {
-                            mobileMenu.classList.toggle('hidden');
-                        });
-                        mobileMenu.querySelectorAll('a').forEach(link => {
-                            link.addEventListener('click', () => { mobileMenu.classList.add('hidden'); });
-                        });
-                        console.log("Mobile menu initialized.");
-                    } else { console.warn('Mobile menu elements not found.'); }
-                 } catch (menuError) {
-                      console.error("Mobile menu initialization failed:", menuError);
-                 }
-
-
-                 // --- Scroll Animations ---
-                 try { // Added try-catch for Scroll Animations
-                     const animatedSections = document.querySelectorAll('.animate-on-scroll');
-                     if ("IntersectionObserver" in window && animatedSections.length > 0) {
-                         const observer = new IntersectionObserver(entries => {
-                             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
-                         }, { threshold: 0.1 });
-                         animatedSections.forEach(section => observer.observe(section));
-                         console.log(`Scroll animations initialized for ${animatedSections.length} elements.`);
-                     } else {
-                         animatedSections.forEach(section => section.classList.add('is-visible')); // Fallback
-                         if(animatedSections.length > 0) console.warn("IntersectionObserver not supported, showing all animated sections.");
-                         else console.warn('No elements found for scroll animation.');
-                     }
-                 } catch (scrollError) {
-                      console.error("Scroll animation initialization failed:", scrollError);
-                 }
-
-                 // --- Footer Year ---
-                 try { // Added try-catch for Footer Year
-                     const yearSpan = document.getElementById('current-year');
-                     if (yearSpan) {
-                         yearSpan.textContent = new Date().getFullYear();
-                     } else { console.warn('Current year span not found.'); }
-                 } catch (footerError) {
-                      console.error("Footer year update failed:", footerError);
-                 }
-
-
-             } catch (error) {
-                 console.error("Error initializing UI effects:", error);
+             } catch (typedError) {
+                 console.error("Typed.js initialization failed:", typedError);
+                 const subtitleElement = document.getElementById('typed-subtitle');
+                 if(subtitleElement) subtitleElement.textContent = 'IIIT-Delhi Student'; // Fallback
              }
+
+             // --- Mobile Menu Toggle ---
+             try { 
+                const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenuBtn && mobileMenu) {
+                    mobileMenuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+                    mobileMenu.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => { mobileMenu.classList.add('hidden'); }); });
+                    console.log("Mobile menu initialized.");
+                } else { console.warn('Mobile menu elements not found.'); }
+             } catch (menuError) { console.error("Mobile menu initialization failed:", menuError); }
+
+             // --- Scroll Animations ---
+             try { 
+                 const animatedSections = document.querySelectorAll('.animate-on-scroll');
+                 if ("IntersectionObserver" in window && animatedSections.length > 0) {
+                     const observer = new IntersectionObserver(entries => {
+                         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
+                     }, { threshold: 0.1 });
+                     animatedSections.forEach(section => observer.observe(section));
+                     console.log(`Scroll animations initialized for ${animatedSections.length} elements.`);
+                 } else {
+                     animatedSections.forEach(section => section.classList.add('is-visible')); // Fallback
+                     if(animatedSections.length > 0) console.warn("IntersectionObserver not supported, showing all animated sections.");
+                     else console.warn('No elements found for scroll animation.');
+                 }
+             } catch (scrollError) { console.error("Scroll animation initialization failed:", scrollError); }
+
+             // --- Footer Year ---
+             try { 
+                 const yearSpan = document.getElementById('current-year');
+                 if (yearSpan) { yearSpan.textContent = new Date().getFullYear(); } 
+                 else { console.warn('Current year span not found.'); }
+             } catch (footerError) { console.error("Footer year update failed:", footerError); }
+
         }); // End DOMContentLoaded listener
 
     </script>
